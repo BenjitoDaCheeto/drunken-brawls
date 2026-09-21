@@ -7,16 +7,16 @@ public class BackgroundScroller : MonoBehaviour
 
     void Start()
     {
-        // Get the material from the Quad's renderer
+        // get the material of the background object
         backgroundMaterial = GetComponent<Renderer>().material;
     }
 
     void Update()
     {
-        // Calculate the new X offset based on time and speed
+        // offset the texture based on time and scroll speed
         float xOffset = Time.time * scrollSpeed;
         
-        // Apply the offset to the main texture
+        // apply the offset to the material's texture
         backgroundMaterial.mainTextureOffset = new Vector2(xOffset, 0);
     }
 }
