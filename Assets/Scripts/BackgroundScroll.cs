@@ -1,22 +1,38 @@
 using UnityEngine;
 
-public class BackgroundScroller : MonoBehaviour
+public class BackgroundScroll : MonoBehaviour
 {
     [SerializeField] private float scrollSpeed = 0.5f;
+
     private Material backgroundMaterial;
+    private float xOffset = 0f;
+
+    public bool isScrolling = true;
 
     void Start()
     {
-        // get the material of the background object
         backgroundMaterial = GetComponent<Renderer>().material;
     }
 
     void Update()
     {
-        // offset the texture based on time and scroll speed
-        float xOffset = Time.time * scrollSpeed;
-        
-        // apply the offset to the material's texture
-        backgroundMaterial.mainTextureOffset = new Vector2(xOffset, 0);
+        if (isScrolling)
+        {
+            // Increase offset only while we're moving
+            xOffset += scrollSpeed * Time.deltaTime;
+
+            backgroundMaterial.mainTextureOffset =
+                new Vector2(xOffset, 0);
+        }
+    }
+
+    public void StartScrolling()
+    {
+        isScrolling = true;
+    }
+
+    public void StopScrolling()
+    {
+        isScrolling = false;
     }
 }
