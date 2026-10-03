@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class RockPaperScissorsEncounter : MonoBehaviour
 {
@@ -10,67 +9,66 @@ public class RockPaperScissorsEncounter : MonoBehaviour
         Scissors
     }
 
+    [SerializeField] private GameObject choicePanel;
+    [SerializeField] private WorldMovement worldMovement;
+    [SerializeField] private LivesManager livesManager;
+    [SerializeField] private AudioSource damageSound;
+    [SerializeField] private AudioSource winSound;
+
     private Choice enemyChoice;
 
-    [SerializeField] private GameObject choiceCanvas;
-    [SerializeField] private WorldMovement worldMovement;
+    // the enemy currently fighting the player
+    private GameObject currentEnemy;
 
     void Start()
     {
-        // hide choice buttons for now
-        choiceCanvas.SetActive(false);
+        choicePanel.SetActive(false);
     }
 
-    public void StartEncounter()
+    public void StartEncounter(GameObject enemy)
     {
-        // enemy randomly chooses rock, paper, or scissors
+        currentEnemy = enemy;
+        
+        // randomly select 0/1/2 for rock/paper/scissors
         enemyChoice = (Choice)Random.Range(0, 3);
 
         Debug.Log("Enemy chose: " + enemyChoice);
 
-        // show choice buttons
-        choiceCanvas.SetActive(true);
+        choicePanel.SetActive(true);
     }
 
-    // called by rock button
+    // called by UI buttons 
     public void ChooseRock()
     {
         CheckResult(Choice.Rock);
-        Debug.Log("Player chose: Rock");
     }
 
-    // called by paper button  
     public void ChoosePaper()
     {
         CheckResult(Choice.Paper);
-        Debug.Log("Player chose: Paper");
     }
 
-    // called by scissors button
     public void ChooseScissors()
     {
         CheckResult(Choice.Scissors);
-        Debug.Log("Player chose: Scissors");
     }
 
+    // rock paper scissors logic
     void CheckResult(Choice playerChoice)
     {
-        // hide ui once the choice has been selected
-        choiceCanvas.SetActive(false);
+        choicePanel.SetActive(false);
 
         Debug.Log("Player chose: " + playerChoice);
         Debug.Log("Enemy chose: " + enemyChoice);
 
-        // if draw, restart
         if (playerChoice == enemyChoice)
         {
-            Debug.Log("DRAW!");
+            Debug.Log("DRAW");
 
-            StartEncounter();
+            StartEncounter(currentEnemy);
             return;
         }
 
-        // rock paper scissors logic
         bool playerWon =
             (playerChoice == Choice.Rock && enemyChoice == Choice.Scissors) ||
             (playerChoice == Choice.Paper && enemyChoice == Choice.Rock) ||
@@ -90,15 +88,26 @@ public class RockPaperScissorsEncounter : MonoBehaviour
     {
         Debug.Log("YOU WIN!");
 
+        winSound.Play();
         worldMovement.StartWorld();
 
-        Destroy(gameObject);
+        // reset this so the next enemy can move
+        Enemy.hasReachedCamera = false;
+
+        Destroy(currentEnemy);
     }
 
     void PlayerLoses()
     {
-        Debug.Log("YOU DIED!");
+        Debug.Log("YOU LOST!");
 
-        SceneManager.LoadScene("YouDied");
+        damageSound.Play();
+        livesManager.LoseLife();
+        worldMovement.StartWorld();
+
+        // reset this so the next enemy can move
+        Enemy.hasReachedCamera = false;
+
+        Destroy(currentEnemy);
     }
 }

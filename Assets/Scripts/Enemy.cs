@@ -8,7 +8,7 @@ public class Enemy : MonoBehaviour
     [SerializeField] private WorldMovement worldMovement;
     [SerializeField] private RockPaperScissorsEncounter encounter;
 
-    private bool hasReachedCamera = false;
+    public static bool hasReachedCamera = false;
 
     void Start()
     {
@@ -47,10 +47,8 @@ public class Enemy : MonoBehaviour
     {
         hasReachedCamera = true;
 
-        Debug.Log("Enemy reached camera!");
-
         worldMovement.StopWorld();
 
-        encounter.StartEncounter();
+        encounter.StartEncounter(gameObject);
     }
 }
